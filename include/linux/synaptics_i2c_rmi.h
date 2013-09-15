@@ -169,5 +169,7 @@ enum {
 	FUNCTION
 };
 
+extern uint8_t touchscreen_is_on(void);  
+
 extern uint8_t getPowerKeyState(void);
 #endif 
