@@ -32,6 +32,9 @@
 
 #include <trace/events/power.h>
 
+int FREQ_STEPS;
+
+
 static struct cpufreq_driver *cpufreq_driver;
 static DEFINE_PER_CPU(struct cpufreq_policy *, cpufreq_cpu_data);
 #ifdef CONFIG_HOTPLUG_CPU
@@ -477,6 +480,209 @@ static ssize_t show_related_cpus(struct cpufreq_policy *policy, char *buf)
 	return show_cpus(policy->related_cpus, buf);
 }
 
+
+extern ssize_t acpuclk_get_vdd_levels_str(char *buf, int isApp);
+extern void acpuclk_set_vdd(unsigned acpu_khz, int vdd);
+extern void acpuclk_UV_mV_table(int cnt, int vdd_uv[]);
+
+static ssize_t show_vdd_levels(struct kobject *a, struct attribute *b, char *buf) {
+	return acpuclk_get_vdd_levels_str(buf, 0);
+}
+
+static ssize_t store_vdd_levels(struct kobject *a, struct attribute *b, const char *buf, size_t count) {
+
+	int i = 0, j;
+	int pair[2] = { 0, 0 };
+	int sign = 0;
+	struct cpufreq_policy *policy;
+	unsigned int max_oc;
+	policy = cpufreq_cpu_get(0);
+	max_oc = policy->cpuinfo.max_freq;
+	
+	if (max_oc == 1350000) {
+		FREQ_STEPS = 20;
+	} else
+	if (max_oc == 1458000) {
+		FREQ_STEPS = 21;
+	} else
+	if (max_oc == 1512000) {
+		FREQ_STEPS = 22;
+	} else
+	if (max_oc == 1674000) {
+		FREQ_STEPS = 23;
+	} else
+	if (max_oc == 1728000) {
+		FREQ_STEPS = 24;
+	} else
+	if (max_oc == 1809000) {
+		FREQ_STEPS = 25;
+	} else
+	if (max_oc == 1890000) {
+		FREQ_STEPS = 26;
+	} else
+	if (max_oc == 1998000) {
+		FREQ_STEPS = 27;
+	}
+
+	if (count < 1)
+		return 0;
+
+	if (buf[0] == '-') {
+		sign = -1;
+		i++;
+	}
+	else if (buf[0] == '+') {
+		sign = 1;
+		i++;
+	}
+
+	for (j = 0; i < count; i++) {
+
+		char c = buf[i];
+
+		if ((c >= '0') && (c <= '9')) {
+			pair[j] *= 10;
+			pair[j] += (c - '0');
+		}
+		else if ((c == ' ') || (c == '\t')) {
+			if (pair[j] != 0) {
+				j++;
+
+				if ((sign != 0) || (j > 1))
+					break;
+			}
+		}
+		else
+			break;
+	}
+
+	if (sign != 0) {
+		if (pair[0] > 0)
+			acpuclk_set_vdd(0, sign * pair[0]);
+	}
+	else {
+		if ((pair[0] > 0) && (pair[1] > 0))
+			acpuclk_set_vdd((unsigned)pair[0], pair[1]);
+		else
+			return -EINVAL;
+	}
+	return count;
+}
+
+ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf)
+{
+
+	unsigned int max_oc;
+	max_oc = policy->cpuinfo.max_freq;
+	
+	if (max_oc == 1350000) {
+		FREQ_STEPS = 20;
+	} else
+	if (max_oc == 1458000) {
+		FREQ_STEPS = 21;
+	} else
+	if (max_oc == 1512000) {
+		FREQ_STEPS = 22;
+	} else
+	if (max_oc == 1674000) {
+		FREQ_STEPS = 23;
+	} else
+	if (max_oc == 1728000) {
+		FREQ_STEPS = 24;
+	} else
+	if (max_oc == 1809000) {
+		FREQ_STEPS = 25;
+	} else
+	if (max_oc == 1890000) {
+		FREQ_STEPS = 26;
+	} else
+	if (max_oc == 1998000) {
+		FREQ_STEPS = 27;
+	}
+
+	return acpuclk_get_vdd_levels_str(buf, FREQ_STEPS);
+}
+
+ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
+                                      const char *buf, size_t count)
+{
+	unsigned int ret = -EINVAL;
+	int u[FREQ_STEPS];
+	unsigned int max_oc=policy->cpuinfo.max_freq;
+
+	if (max_oc == 1350000) {
+		FREQ_STEPS = 20;
+	} else
+	if (max_oc == 1458000) {
+		FREQ_STEPS = 21;
+	} else
+	if (max_oc == 1512000) {
+		FREQ_STEPS = 22;
+	} else
+	if (max_oc == 1674000) {
+		FREQ_STEPS = 23;
+	} else
+	if (max_oc == 1728000) {
+		FREQ_STEPS = 24;
+	} else
+	if (max_oc == 1809000) {
+		FREQ_STEPS = 25;
+	} else
+	if (max_oc == 1890000) {
+		FREQ_STEPS = 26;
+	} else
+	if (max_oc == 1998000) {
+		FREQ_STEPS = 27;
+	} 		
+
+if (max_oc == 1350000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19]);
+
+} else
+
+if (max_oc == 1458000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20]);
+
+} else
+
+if (max_oc == 1512000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21]);
+
+} else
+
+if (max_oc == 1674000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21], &u[22]);
+
+} else
+
+if (max_oc == 1728000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21], &u[22], &u[23]);
+
+} else
+
+if (max_oc == 1809000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21], &u[22], &u[23], &u[24]);
+
+} else
+
+if (max_oc == 1890000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21], &u[22], &u[23], &u[24], &u[25]);
+
+} else
+
+if (max_oc == 1998000) {
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &u[0], &u[1], &u[2], &u[3], &u[4], &u[5], &u[6], &u[7], &u[8], &u[9], &u[10], &u[11], &u[12], &u[13], &u[14], &u[15], &u[16], &u[17], &u[18], &u[19], &u[20], &u[21], &u[22], &u[23], &u[24], &u[25], &u[26]);
+
+}
+
+	if(ret != FREQ_STEPS) {
+		return -EINVAL;
+	}
+
+	acpuclk_UV_mV_table(FREQ_STEPS, u);
+	return count;
+}
+
 static ssize_t show_affected_cpus(struct cpufreq_policy *policy, char *buf)
 {
 	return show_cpus(policy->cpus, buf);
@@ -535,6 +741,9 @@ cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
+cpufreq_freq_attr_rw(UV_mV_table);
+
+define_one_global_rw(vdd_levels);
 
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
@@ -549,7 +758,18 @@ static struct attribute *default_attrs[] = {
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
+	&UV_mV_table.attr,
 	NULL
+};
+
+static struct attribute *vddtbl_attrs[] = {
+	&vdd_levels.attr,
+	NULL
+};
+
+static struct attribute_group vddtbl_attr_group = {
+	.attrs = vddtbl_attrs,
+	.name = "vdd_table",
 };
 
 struct kobject *cpufreq_global_kobject;
@@ -656,20 +876,37 @@ static int cpufreq_add_dev_policy(unsigned int cpu,
 #ifdef CONFIG_HOTPLUG_CPU
 	struct cpufreq_governor *gov;
 
+//***flar2: the find_governor function works as-is, so don't skip it
+//***ADD HERE TO INSURE SECONDARY CPU'S ALWAYS FOLLOW CPU0**	
+	if(cpu >=1){   // force all other cpu's to follow cpu0
+		cpufreq_policy_save.max = per_cpu(cpufreq_cpu_data,0)->max;	
+		cpufreq_policy_save.min = per_cpu(cpufreq_cpu_data,0)->min;
+		policy->min = cpufreq_policy_save.min;
+		policy->user_policy.min = policy->min;
+		policy->max = cpufreq_policy_save.max;
+		policy->user_policy.max = policy->max;
+//		goto jump_out;
+	}
+//***END
+
 	gov = __find_governor(per_cpu(cpufreq_policy_save, cpu).gov);
 	if (gov) {
 		policy->governor = gov;
 		pr_debug("Restoring governor %s for cpu %d\n",
 		       policy->governor->name, cpu);
 	}
-	if (per_cpu(cpufreq_policy_save, cpu).min) {
-		policy->min = per_cpu(cpufreq_policy_save, cpu).min;
-		policy->user_policy.min = policy->min;
-	}
-	if (per_cpu(cpufreq_policy_save, cpu).max) {
-		policy->max = per_cpu(cpufreq_policy_save, cpu).max;
-		policy->user_policy.max = policy->max;
-	}
+//	if (per_cpu(cpufreq_policy_save, cpu).min) {
+//		policy->min = per_cpu(cpufreq_policy_save, cpu).min;
+//		policy->user_policy.min = policy->min;
+//	}
+//	if (per_cpu(cpufreq_policy_save, cpu).max) {
+//		policy->max = per_cpu(cpufreq_policy_save, cpu).max;
+//		policy->user_policy.max = policy->max;
+//	}
+
+//**ADD THIS ALSO	
+//jump_out:
+
 	pr_debug("Restoring CPU%d min %d and max %d\n",
 		cpu, policy->min, policy->max);
 #endif
@@ -832,6 +1069,7 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	unsigned long flags;
 	unsigned int j;
 #ifdef CONFIG_HOTPLUG_CPU
+	struct cpufreq_policy *cp;
 	int sibling;
 #endif
 
@@ -878,10 +1116,14 @@ static int cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	
 #ifdef CONFIG_HOTPLUG_CPU
 	for_each_online_cpu(sibling) {
-		struct cpufreq_policy *cp = per_cpu(cpufreq_cpu_data, sibling);
+		cp = per_cpu(cpufreq_cpu_data, sibling);
 		if (cp && cp->governor &&
 		    (cpumask_test_cpu(cpu, cp->related_cpus))) {
 			policy->governor = cp->governor;
+			policy->min = cp->min;
+			policy->max = cp->max;
+			policy->user_policy.min = cp->user_policy.min;
+			policy->user_policy.max = cp->user_policy.max;
 			found = 1;
 			break;
 		}
@@ -1484,6 +1726,21 @@ static int __cpufreq_set_policy(struct cpufreq_policy *data,
 {
 	int ret = 0;
 
+//***flar2: no need to copy governor from cpu1
+//***ADD HERE TO ENSURE ANYTIME THERE IS A POLICY CHANGE SECONDARY CPU ALWAYS
+//***FOLLOWS CPU0
+	struct cpufreq_policy *cpu0_policy;
+	if(data->cpu >= 1){
+	pr_debug("forcing cpu0 policy on cpu\n");
+	cpu0_policy = cpufreq_cpu_get(0); // force cpu1 to follow policy of cpu0
+	policy->min = cpu0_policy->min;
+	policy->max = cpu0_policy->max;
+//	if(cpu0_policy->user_policy.governor){
+//		policy->governor = cpu0_policy->user_policy.governor;
+//		}	
+	}
+//***END
+
 	pr_debug("setting new policy for CPU %u: %u - %u kHz\n", policy->cpu,
 		policy->min, policy->max);
 
@@ -1732,6 +1989,7 @@ EXPORT_SYMBOL_GPL(cpufreq_unregister_driver);
 static int __init cpufreq_core_init(void)
 {
 	int cpu;
+	int rc;
 
 	if (cpufreq_disabled())
 		return -ENODEV;
@@ -1743,6 +2001,7 @@ static int __init cpufreq_core_init(void)
 
 	cpufreq_global_kobject = kobject_create_and_add("cpufreq", &cpu_subsys.dev_root->kobj);
 	BUG_ON(!cpufreq_global_kobject);
+	rc = sysfs_create_group(cpufreq_global_kobject, &vddtbl_attr_group);
 	register_syscore_ops(&cpufreq_syscore_ops);
 
 	return 0;

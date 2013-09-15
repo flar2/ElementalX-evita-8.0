@@ -23,7 +23,8 @@
 
 #define CPUFREQ_NAME_LEN 16
 
-
+/** cmdline **/
+extern uint32_t arg_max_oc;
 
 #define CPUFREQ_TRANSITION_NOTIFIER	(0)
 #define CPUFREQ_POLICY_NOTIFIER		(1)
@@ -333,6 +334,8 @@ extern struct cpufreq_governor cpufreq_gov_intellidemand;
 
 #define CPUFREQ_ENTRY_INVALID ~0
 #define CPUFREQ_TABLE_END     ~1
+
+extern uint32_t arg_max_oc;
 
 struct cpufreq_frequency_table {
 	unsigned int	index;     
