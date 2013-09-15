@@ -134,7 +134,6 @@
 extern int panel_type;
 static unsigned int engineerid;
 
-
 #ifdef CONFIG_FLASHLIGHT_TPS61310
 static void config_flashlight_gpios(void)
 {
@@ -263,6 +262,30 @@ static struct pm8xxx_mpp_init pm8921_mpps[] __initdata = {
 	PM8XXX_MPP_INIT(PM8XXX_AMUX_MPP_11, D_BI_DIR, PM8921_MPP_DIG_LEVEL_S4, BI_PULLUP_10KOHM),
 	PM8XXX_MPP_INIT(PM8XXX_AMUX_MPP_12, D_BI_DIR, PM8921_MPP_DIG_LEVEL_L17, BI_PULLUP_10KOHM),
 };
+
+
+/*gpuoc*/
+
+uint32_t max_gpu = 0;
+
+static int __init read_max_gpu(char *gpu_oc)
+{
+	unsigned long ui_khz;
+	int err;
+	err = strict_strtoul(gpu_oc, 0, &ui_khz);
+	if (err) {
+		max_gpu = 0;
+		printk(KERN_INFO "[devices-8960]: ERROR using default values!");
+		printk(KERN_INFO "[devices-8960]: gpu_oc='%i'\n", max_gpu);
+		return 1;
+	}
+	
+	max_gpu = ui_khz;
+
+	return 0;
+}
+__setup("gpu_oc=", read_max_gpu);
+/*end gpuoc*/
 
 static void __init pm8921_gpio_mpp_init(void)
 {
@@ -5065,6 +5088,20 @@ static void __init msm8960_gfx_init(void)
 		platform_device_register(&msm_kgsl_2d0);
 		platform_device_register(&msm_kgsl_2d1);
 	}
+	
+/*gpuoc*/
+	if (max_gpu == 0) {
+		struct kgsl_device_platform_data *kgsl_3d0_pdata =
+				msm_kgsl_3d0.dev.platform_data;
+		struct kgsl_device_platform_data *kgsl_2d0_pdata =
+				msm_kgsl_2d0.dev.platform_data;
+		struct kgsl_device_platform_data *kgsl_2d1_pdata =
+				msm_kgsl_2d1.dev.platform_data;
+		kgsl_2d0_pdata->pwrlevel[0].gpu_freq = 200000000; 
+		kgsl_2d1_pdata->pwrlevel[0].gpu_freq = 200000000; 
+		kgsl_3d0_pdata->pwrlevel[0].gpu_freq = 400000000;
+	}
+/*end gpuoc*/
 }
 
 #ifdef CONFIG_HTC_BATT_8960
@@ -5941,7 +5978,6 @@ static void __init elite_init(void)
 	if(!cpu_is_krait_v1())
 		set_two_phase_freq(1134000);
 #endif
-
 	
 	if (!(board_mfg_mode() == 6 || board_mfg_mode() == 7))
 		elite_add_usb_devices();

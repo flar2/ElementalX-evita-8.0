@@ -2986,7 +2986,7 @@ static struct msm_bus_vectors grp3d_max_vectors[] = {
 		.src = MSM_BUS_MASTER_GRAPHICS_3D,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
 		.ab = 0,
-		.ib = KGSL_CONVERT_TO_MBPS(3968),
+		.ib = KGSL_CONVERT_TO_MBPS(4264),
 	},
 };
 
@@ -3148,7 +3148,7 @@ static struct kgsl_device_iommu_data kgsl_3d0_iommu_data[] = {
 static struct kgsl_device_platform_data kgsl_3d0_pdata = {
 	.pwrlevel = {
 		{
-			.gpu_freq = 400000000,
+			.gpu_freq = 480000000,
 			.bus_freq = 4,
 			.io_fraction = 0,
 		},
@@ -3227,7 +3227,7 @@ static struct kgsl_device_iommu_data kgsl_2d0_iommu_data[] = {
 static struct kgsl_device_platform_data kgsl_2d0_pdata = {
 	.pwrlevel = {
 		{
-			.gpu_freq = 200000000,
+			.gpu_freq = 266000000,
 			.bus_freq = 2,
 		},
 		{
@@ -3294,7 +3294,7 @@ static struct resource kgsl_2d1_resources[] = {
 static struct kgsl_device_platform_data kgsl_2d1_pdata = {
 	.pwrlevel = {
 		{
-			.gpu_freq = 200000000,
+			.gpu_freq = 266000000,
 			.bus_freq = 2,
 		},
 		{
@@ -3315,11 +3315,11 @@ static struct kgsl_device_platform_data kgsl_2d1_pdata = {
 #ifdef CONFIG_MSM_BUS_SCALING
 	.bus_scale_table = &grp2d1_bus_scale_pdata,
 #endif
-	.iommu_data = kgsl_2d1_iommu_data,
+       .iommu_data = kgsl_2d1_iommu_data,
 	.iommu_count = ARRAY_SIZE(kgsl_2d1_iommu_data),
 	.core_info = &grp2d_core_info,
 };
-
+	
 struct platform_device msm_kgsl_2d1 = {
 	.name = "kgsl-2d1",
 	.id = 1,
