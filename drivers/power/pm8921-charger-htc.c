@@ -4223,7 +4223,7 @@ static void dump_irq_rt_status(void)
 
 static void dump_reg(void)
 {
-	u64 val;
+	u64 val = 0;
 	unsigned int len =0;
 
 	memset(batt_log_buf, 0, sizeof(BATT_LOG_BUF_LEN));
